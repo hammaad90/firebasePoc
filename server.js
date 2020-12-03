@@ -17,15 +17,16 @@ app.get('/', (req, res) => {
 	res.sendFile(__dirname + '/login.html');
 });
 
-app.get('/success', checkCookie, (req, res) => {
+app.get('/success', (req, res) => {
 	res.sendFile(__dirname + '/success.html');
-	console.log("UID of Signed in User is" + req.decodedClaims.uid);
+	// console.log("UID of Signed in User is" + req.decodedClaims.uid);
 	//You will reach here only if session is working Fine
 });
 
 app.get('/savecookie', (req, res) => {
 	const Idtoken = req.query.idToken;
-	savecookie(Idtoken, res);
+	res.redirect('/success');
+	// savecookie(Idtoken, res);
 });
 
 async function savecookie(idtoken, res) {
@@ -34,6 +35,8 @@ async function savecookie(idtoken, res) {
 		let sessionCookie = await admin.auth().createSessionCookie(idtoken, { expiresIn });
 		const options = { maxAge: expiresIn, httpOnly: true, secure: true };
 		res.cookie('__session', sessionCookie, options);
+		// let a = await admin.auth().verifyIdToken(idtoken);
+		// console.log('aaaaaaaaaaaaaaaaaaa', a)
 		res.end(JSON.stringify({ sessionCookie }));
 		let decodedClaims = await admin.auth().verifyIdToken(idtoken);
 		//res.redirect('/success');
