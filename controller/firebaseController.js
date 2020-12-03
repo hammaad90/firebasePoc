@@ -5,10 +5,10 @@ const bcrypt = require('bcrypt');
 const createUser =  async function(req, res) {
     try {
        // through nodejs client sdk
-      //let user = await fb.auth().createUserWithEmailAndPassword(req.body.email, req.body.password)
+      let user = await fb.auth().createUserWithEmailAndPassword(req.body.email, req.body.password)
        // through nodejs server side sdk
-      let encryptedPassword =  await bcrypt.hashSync(req.body.password, 8); 
-      let user =  await admin.auth().createUser({email: req.body.email, password: encryptedPassword, emailVerified: false});
+      // let encryptedPassword =  await bcrypt.hashSync(req.body.password, 8); 
+      // let user =  await admin.auth().createUser({email: req.body.email, password: encryptedPassword, emailVerified: false});
       // let emailsent = await admin.auth().generateEmailVerificationLink(req.body.email);
       // let passwordResetLink = await admin.auth().generatePasswordResetLink(req.body.email)
       // console.log('passwordResetLink', passwordResetLink)
@@ -51,7 +51,7 @@ const createUser =  async function(req, res) {
         result  = user;
       }
       return res
-        .json(result)
+        .json({info:"user Login", result})
     } catch (e) {
       console.log(e)
      res.json({message:'Error login!!'})

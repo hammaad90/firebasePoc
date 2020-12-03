@@ -15,10 +15,43 @@
 </head>
 <body>
     
-    <h1 style="text-align: center;" >Sign in with Google Example </h1>
+    <h1 style="text-align: center;" >Sign in with Firebase Example </h1>
+
+    <form style="text-align: center" action="http://localhost:3000/api/createUser" method="post">
+      
+        <div class="container">
+          <label for="uname"><b>Email</b></label>
+          <input type="text" placeholder="Enter Username" name="email" required><br>
+      
+          <label for="psw"><b>Password</b></label>
+          <input style="margin-bottom: 10px;" type="password" placeholder="Enter Password" name="password" required><br>
+      
+          <button type="submit">Create User</button>
+        </div>
+      </form>
+
+
+    <h1 style="text-align: center; color;"><button style="color: cornflowerblue;" id="Facebook">Sign in with Facebook </button></h1>
     <div id="firebaseui-auth-container">
 
     </div>
+
+
+    <h1 style="text-align: center;" >Log in with Firebase Example </h1>
+    <form style="text-align: center" action="http://localhost:3000/api/login" method="post">
+      
+        <div class="container">
+          <label for="uname"><b>Email</b></label>
+          <input type="text" placeholder="Enter Username" name="email" required><br>
+      
+          <label for="psw"><b>Password</b></label>
+          <input style="margin-bottom: 10px;" type="password" placeholder="Enter Password" name="password" required><br>
+      
+          <button type="submit">Login</button>
+        </div>
+      </form>
+
+
 
     <script>
         var config = {
@@ -27,6 +60,19 @@
             databaseURL: "https://nodejspoc-619dc.firebaseio.com",
             appId: "1:268629299975:web:dba6bba672f05be9462ba2"
       };
+      var facebook =  document.getElementById('Facebook');
+      facebook.addEventListener('click', e =>{
+        const FacebookAuth = new firebase.auth.FacebookAuthProvider();
+        firebase.auth().signInWithPopup(FacebookAuth).then(function(result){
+            var token =  result.credential.accessToken;
+            var user =  result.user;
+        }).catch(function(err){
+            var errorCode = error.code;
+            var errorMsg = error.message;
+            var email = error.email;
+            var credential =  error.credential;
+        })
+      })
         firebase.initializeApp(config);
         firebase.auth().setPersistence(firebase.auth.Auth.Persistence.NONE);
     
@@ -36,6 +82,7 @@
             // google sign in option
             firebase.auth.GoogleAuthProvider.PROVIDER_ID,
         ],
+        
     
         // Terms of service url/callback.
         // tosUrl: '<your-tos-url>',
