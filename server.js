@@ -28,41 +28,35 @@ app.get('/savecookie', (req, res) => {
 	savecookie(Idtoken, res);
 });
 
-function savecookie(idtoken, res) {
+async function savecookie(idtoken, res) {
+	try {
+		const expiresIn = 60 * 60 * 24 * 5 * 1000;
+		let sessionCookie = await admin.auth().createSessionCookie(idtoken, { expiresIn });
+		const options = { maxAge: expiresIn, httpOnly: true, secure: true };
+		res.cookie('__session', sessionCookie, options);
+		res.end(JSON.stringify({ sessionCookie }));
+		let decodedClaims = await admin.auth().verifyIdToken(idtoken);
+		//res.redirect('/success');
+	} catch (error) {
+		console.log(error);
+		res.status(401).send("UnAuthorised Request");
+	}
 
-	const expiresIn = 60 * 60 * 24 * 5 * 1000;
-	admin.auth().createSessionCookie(idtoken, { expiresIn })
-		.then(async (sessionCookie) => {
-			const options = { maxAge: expiresIn, httpOnly: true, secure: true };
-			res.cookie('__session', sessionCookie, options);
-			await res.end(JSON.stringify({ sessionCookie }));
-			admin.auth().verifyIdToken(idtoken).then(function (decodedClaims) {
-				res.redirect('/success');
-			});
-
-		}, error => {
-			console.log(error);
-			res.status(401).send("UnAuthorised Request");
-
-		});
 }
 
 
-function checkCookie(req, res, next) {
-
-
-	const sessionCookie = req.cookies.__session || '';
-	admin.auth().verifySessionCookie(
-		sessionCookie, true).then((decodedClaims) => {
-			res.end(JSON.stringify({ decodedClaims }));
-			req.decodedClaims = decodedClaims;
-			next();
-		})
-		.catch(error => {
-			console.log('errr', error)
-			// Session cookie is unavailable or invalid. Force user to login.
-			res.redirect('/login');
-		});
+async function checkCookie(req, res, next) {
+	try {
+		const sessionCookie = req.cookies.__session || '';
+		let decodedClaims = await admin.auth().verifySessionCookie(sessionCookie, true);
+		// res.end(JSON.stringify({ decodedClaims }));
+		req.decodedClaims = decodedClaims;
+		next();
+	} catch (error) {
+		console.log('errr', error)
+		// Session cookie is unavailable or invalid. Force user to login.
+		res.redirect('/login');
+	}
 
 }
 
